@@ -119,9 +119,10 @@ while game:
                 player.rect.y -= 8
                 player.fall = False
         player.move()
+        # НЕРАБОЧИЙ ПРЫЖОК 
         player.jump()
+        # НЕРАБОЧИЙ ПРЫЖОК 
         player.animation()
-        player.update()
     # Обязательная часть цикла
     for e in event.get():
         if e.type == QUIT:
