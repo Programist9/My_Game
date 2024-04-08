@@ -2,22 +2,22 @@ import pygame
 import os
 
 # Инициализация Pygame
-pygame.init()
+init()
 
 # Установка размеров экрана
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("Простой платформер")
+screen = display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+display.set_caption("Простой платформер")
 
 # Загрузка изображений
 
-background_image = pygame.image.load('background.jpg')
-block_image = pygame.image.load('block.jpg')
-main_char_image = pygame.image.load('mainChar.png')
+background_image = image.load('background.jpg')
+block_image = image.load('block.jpg')
+main_char_image = image.load('mainChar.png')
 
 # Класс для представления персонажа
-class Character(pygame.sprite.Sprite):
+class Character(sprite.Sprite):
     def __init__(self):
         super().__init__()
         self.image = main_char_image
@@ -28,8 +28,8 @@ class Character(pygame.sprite.Sprite):
         self.jump_power = -10
 
     def update(self):
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_SPACE] and self.rect.bottom >= SCREEN_HEIGHT:
+        keys = key.get_pressed()
+        if keys[K_SPACE] and self.rect.bottom >= SCREEN_HEIGHT:
             self.vel_y = self.jump_power
         self.vel_y += 1
         if self.rect.bottom < SCREEN_HEIGHT:
@@ -38,7 +38,7 @@ class Character(pygame.sprite.Sprite):
             self.rect.y = SCREEN_HEIGHT - self.rect.height
 
 # Класс для представления блоков
-class Block(pygame.sprite.Sprite):
+class Block(sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
         self.image = block_image
@@ -48,7 +48,7 @@ class Block(pygame.sprite.Sprite):
 
 # Функция для создания уровня
 def create_level():
-    level = pygame.sprite.Group()
+    level = sprite.Group()
     for i in range(10):
         block = Block(i * 100, SCREEN_HEIGHT - 50)
         level.add(block)
@@ -60,10 +60,10 @@ level = create_level()
 
 # Основной игровой цикл
 running = True
-clock = pygame.time.Clock()
+clock = time.Clock()
 while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
+    for event in event.get():
+        if event.type == QUIT:
             running = False
 
     screen.blit(background_image, (0, 0))
@@ -73,7 +73,7 @@ while running:
 
     level.draw(screen)
 
-    pygame.display.flip()
+    display.flip()
     clock.tick(30)
 
-pygame.quit()
+quit()
