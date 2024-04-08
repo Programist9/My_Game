@@ -49,11 +49,8 @@ class Player(Sprite):
         self.count = 0
 
         self.isJump = False
-        self.jumpCount = 60
         self.fall = False
-
-        self.jump_count = 10
-        self.jump_height = self.rect.y - 150
+        self.jump_count = 60
     def move(self):
         k = key.get_pressed()
         if k[K_a] and self.rect.x >= 0:
@@ -72,14 +69,15 @@ class Player(Sprite):
             self.rect.y += 8
             self.fall = True
 # НЕРАБОЧИЙ ПРЫЖОК 
+
     def jump(self):
         k = key.get_pressed()
-        if k[K_SPACE]:
+        if k[K_SPACE] and self.fall == False and self.isJump == False:
             self.isJump = True
         if self.jump_count == 0:
             self.isJump = False
             self.jump_count = 60
-        if self.isJump and self.fall == False:
+        if self.isJump:
             self.rect.y -= self.jump_count
             self.jump_count -= 4
 # НЕРАБОЧИЙ ПРЫЖОК 
