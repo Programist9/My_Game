@@ -5,7 +5,7 @@ init()
 win_w, win_h = 900, 700
 display.set_caption("Платформер")
 window=display.set_mode((win_w, win_h))
-FPS = 6
+FPS = 8
 clock = time.Clock()
 # Музыка
 mixer_music.load("backgroundMusic.mp3")
@@ -81,17 +81,14 @@ class Player(Sprite):
             self.rect.y -= self.jump_count
             self.jump_count -= 4
 # НЕРАБОЧИЙ ПРЫЖОК 
-
-
-
     def animation(self):
         if self.count + 1 >= 6:
             self.count = 0
         if self.left == True:
-            window.blit(walk_left[self.count // 3], (self.rect.x,self.rect.y))
+            window.blit(walk_left[self.count // 4], (self.rect.x,self.rect.y))
             self.count += 1
         elif self.right == True:
-            window.blit(walk_right[self.count // 3], (self.rect.x,self.rect.y))
+            window.blit(walk_right[self.count // 4], (self.rect.x,self.rect.y))
             self.count += 1
         else:
             window.blit(self.image,(self.rect.x,self.rect.y))
