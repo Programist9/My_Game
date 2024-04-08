@@ -5,7 +5,7 @@ init()
 win_w, win_h = 900, 700
 display.set_caption("Платформер")
 window=display.set_mode((win_w, win_h))
-FPS = 8
+FPS = 20
 clock = time.Clock()
 # Музыка
 mixer_music.load("backgroundMusic.mp3")
@@ -65,35 +65,32 @@ class Player(Sprite):
             self.left = False
             self.right = False
             self.count = 0
-        if self.rect.bottom < win_h:
-            self.rect.y += 8
-            self.fall = True
 # НЕРАБОЧИЙ ПРЫЖОК 
 
-    def jump(self):
-        k = key.get_pressed()
-        if k[K_SPACE] and self.fall == False and self.isJump == False:
-            self.isJump = True
-        if self.jump_count == 0:
-            self.isJump = False
-            self.jump_count = 60
-        if self.isJump:
-            self.rect.y -= self.jump_count
-            self.jump_count -= 4
+    # def jump(self):
+    #     k = key.get_pressed()
+    #     if k[K_SPACE] and self.fall == False and self.isJump == False:
+    #         self.isJump = True
+    #     if self.jump_count == 0:
+    #         self.isJump = False
+    #         self.jump_count = 60
+    #     if self.isJump:
+    #         self.rect.y -= self.jump_count
+    #         self.jump_count -= 4
 # НЕРАБОЧИЙ ПРЫЖОК 
     def animation(self):
         if self.count + 1 >= 6:
             self.count = 0
         if self.left == True:
-            window.blit(walk_left[self.count // 4], (self.rect.x,self.rect.y))
+            window.blit(walk_left[self.count // 10], (self.rect.x,self.rect.y))
             self.count += 1
         elif self.right == True:
-            window.blit(walk_right[self.count // 4], (self.rect.x,self.rect.y))
+            window.blit(walk_right[self.count // 10], (self.rect.x,self.rect.y))
             self.count += 1
         else:
             window.blit(self.image,(self.rect.x,self.rect.y))
 # Создание объектов и персонажа
-player = Player(20, 400, 47, 62, "mainChar.png", 10)
+player = Player(20, 200, 47, 62, "mainChar.png", 10)
 blocks = []
 my_x = 0
 for i in range(13):
@@ -106,29 +103,33 @@ pause = False
 game = True
 while game:
     window.blit(background,(0,0))
-    if pause == False:
+    
         # Второстепенная часть цикла
-        for block in blocks:
-            block.update()
-            if player.rect.colliderect(block.rect):
-                player.rect.y -= 8
-                player.fall = False
+    for block in blocks:
+        if player.rect.colliderect(block.rect):
+            # player.rect.y -= 8
+            player.fall = False
+            print('2')
+        else:
+            player.rect.y += 0.5
+            player.fall = True
+            print('1')
+        block.update()
+    if pause == False:
         player.move()
         # НЕРАБОЧИЙ ПРЫЖОК 
-        player.jump()
+        # player.jump()
         # НЕРАБОЧИЙ ПРЫЖОК 
-        player.animation()
+    player.animation()
     # Обязательная часть цикла
     for e in event.get():
         if e.type == QUIT:
             game = False
-        if e.type == KEYDOWN and e.key == K_ESCAPE and pause == False:
+        if e.type == KEYDOWN and e.key == K_r and pause == False:
             pause = True
-            font = font.Font(None, 80)
-            text = '//'
-            text_surface = font.render(text, True, (0, 0, 0))
-            text_rect = text_surface.get_rect(center=(win_w // 2, win_h // 2))
+            print('xyi')
         if e.type == KEYDOWN and e.key == K_ESCAPE and pause == True:
             pause = False
+            print('He xyi')
     display.update()
     clock.tick(FPS)
