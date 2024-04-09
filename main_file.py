@@ -100,7 +100,7 @@ class Player(Sprite):
         else:
             self.rect.y += self.speed //2 * lose
         if self.jumping:
-            if self.jumpCount == -10:
+            if self.jumpCount == -15:
                 self.jumpCount = 20
                 self.jumping = False
             else:
@@ -132,7 +132,7 @@ text_rect_options = text_surface_options.get_rect()
 text_rect_options.center = (win_w // 6, win_h // 2)
 # Создание объектов и персонажа
 lose = 1
-player = Player(20, 400, 47, 62, "mainChar.png", 10)
+player = Player(20, win_h - 140, 47, 62, "mainChar.png", 10)
 grass = Block(180, win_h - 140, 70, 70, "block.jpg")
 block3 = Block(180, win_h - 210, 70, 70, "block.jpg")
 Shipi = Block(100, win_h - 140, 70, 70, "Shipi.png")
