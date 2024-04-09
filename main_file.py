@@ -100,7 +100,7 @@ class Player(Sprite):
         else:
             self.rect.y += self.speed //2 * lose
         if self.jumping:
-            if self.jumpCount == -20:
+            if self.jumpCount == -10:
                 self.jumpCount = 20
                 self.jumping = False
             else:
