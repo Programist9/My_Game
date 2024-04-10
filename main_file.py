@@ -1,4 +1,5 @@
 from pygame import *
+from maps import *
 from random import randint
 
 init()
@@ -67,15 +68,20 @@ class Player(Sprite):
         self.jumpCount = 20
 
     def move(self):
+        global camera_count
         k = key.get_pressed()
-        if k[K_a] and self.rect.x >= 0:
-            self.rect.x -= self.speed
+        if k[K_a] and self.rect.x >= 20:
+            if cam_move == False:
+                self.rect.x -= self.speed
             self.left = True
             self.right = False
-        elif k[K_d] and self.rect.right <= win_w:
-            self.rect.x += self.speed
+            camera_count -= 1
+        elif k[K_d] and self.rect.x <= win_w-20:
+            if cam_move == False:
+                self.rect.x += self.speed
             self.right = True
             self.left = False
+            camera_count += 1
         else:
             self.left = False
             self.right = False
@@ -132,52 +138,75 @@ text_rect_options = text_surface_options.get_rect()
 text_rect_options.center = (win_w // 6, win_h // 2)
 # Создание объектов и персонажа
 lose = 1
-player = Player(20, win_h - 140, 47, 62, "mainChar.png", 10)
-grass = Block(180, win_h - 140, 70, 70, "block.jpg")
-block3 = Block(180, win_h - 210, 70, 70, "block.jpg")
-Shipi = Block(100, win_h - 140, 70, 70, "Shipi.png")
-Flag = Block(win_w-80, win_h - 140, 70, 70, "flag.png")
-blocks_first = []
+player = Player(20, win_h - 230, 47, 62, "mainChar.png", 10)
+blocks_first = list()
 blocks = blocks_first
-blocks_first.append(block3)
-blocks_first.append(grass)
-blocks_first.append(Flag)
-blocks_first.append(Shipi)
+# grass = Block(180, win_h - 140, 70, 70, "block.jpg")
+# block3 = Block(180, win_h - 210, 70, 70, "block.jpg")
+# Shipi = Block(100, win_h - 140, 70, 70, "Shipi.png")
+# Flag = Block(win_w-80, win_h - 140, 70, 70, "flag.png")
+
+# blocks_first.append(block3)
+# blocks_first.append(grass)
+# blocks_first.append(Flag)
+# blocks_first.append(Shipi)
 my_x = 0
 my_y = win_h - 70
-for i in range(13):
-    block = Block(my_x, my_y, 70, 70, "grass.jpg")
-    blocks_first.append(block)
-    my_x += 70
-    # my_y -= 50
+
+block_size = 60
+x, y = 0, 0
+
+for line in lvl:
+    for s in line:
+        if s == "1":
+            block = Block(x, y, block_size, block_size, "block.jpg")
+            blocks.append(block)
+        if s == "2":
+            block = Block(x, y, block_size, block_size, "grass.jpg")
+            blocks.append(block)
+        if s == "3":
+            Shipi = Block(x, y, block_size, block_size, "Shipi.png")
+            blocks.append(Shipi)
+        if s == "4":
+            Flag = Block(x, y, block_size, block_size, "flag.png")
+            blocks.append(Flag)
+        x += 60
+    x = 0
+    y += 60
 # Игровой цикл
+camera_count = 0
 pause = False
 game = True
 sec_game = True
 all_game = False
 while game:
     if all_game == True:
+        print(camera_count)
         # Второстепенная часть цикла
         window.blit(background, (0, 0))
         for block in blocks_first:
             block.update()
-            if (player.rect.bottom >= Shipi.rect.top-10 and player.rect.right >= Shipi.rect.left and player.rect.left <= Shipi.rect.right):
+            if (player.rect.bottom >= Shipi.rect.top-40 and player.rect.right >= Shipi.rect.left and player.rect.left <= Shipi.rect.right) or player.rect.colliderect(Shipi.rect):
                 lose = 2
-                print('1')
+            if camera_count > 44 and camera_count < 93:
+                cam_move = True
+                k = key.get_pressed()
+                if k[K_a]:
+                    block.rect.x += player.speed
+                elif k[K_d]:
+                    block.rect.x -= player.speed
+
+            else:
+                cam_move = False
         if sec_game:
-            if lose == 1 and player.rect.y > my_y:#Anti_void
-                player.rect.y = 400
-                player.rect.x = 20
             if lose == 1:
                 player.move()
             elif lose == 2:
-                print('before')
                 mixer_music.stop()
                 mixer_music.load("gameover.mp3")
                 mixer_music.play(1)
                 mixer_music.set_volume(1)
                 sec_game = False
-                print('after')
 
         player.jump(blocks)
         player.animation()
@@ -186,7 +215,6 @@ while game:
         window.blit(text_surface_menu, text_rect_menu)
         window.blit(text_surface_play, text_rect_play)
         window.blit(text_surface_options, text_rect_options)
-        print("here will be menu")
     # Обязательная часть цикла
     for e in event.get():
         if e.type == QUIT:
