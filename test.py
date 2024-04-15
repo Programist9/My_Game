@@ -175,6 +175,9 @@ for line in lvl:
         if s == "4":
             Flag = Block(x, y, block_size, block_size, "flag.png")
             blocks.append(Flag)
+        if s == "5":
+            Coin = Block(x, y, block_size, block_size, "coin.png")
+            coins.append(Coin)
         x += 60
     x = 0
     y += 60

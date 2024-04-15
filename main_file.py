@@ -129,6 +129,16 @@ text_surface_menu = font1.render("МЕНЮ", True, (255, 255, 255))
 text_rect_menu = text_surface_menu.get_rect()
 text_rect_menu.center = (win_w // 2, win_h // 20)
 
+text_surface_restart = font1.render("Заново", True, (255, 0, 0))
+text_rect_restart = text_surface_restart.get_rect()
+text_rect_restart.center = (win_w // 2, win_h // 2)
+
+score = 0
+
+text_surface_score = font1.render(f"Очки: {score}", True, (255, 255, 255))
+text_rect_score = text_surface_score.get_rect()
+text_rect_score.center = (win_w // 2, win_h // 20)
+
 text_surface_play = font2.render("ИГРАТЬ", True, (0,0,0))
 text_rect_play = text_surface_play.get_rect()
 text_rect_play.center = (win_w // 6, win_h // 3.5)
@@ -141,6 +151,7 @@ lose = 1
 player = Player(20, win_h - 230, 47, 62, "mainChar.png", 10)
 blocks_first = list()
 shipis = list()
+coins = list()
 blocks = blocks_first
 # grass = Block(180, win_h - 140, 70, 70, "block.jpg")
 # block3 = Block(180, win_h - 210, 70, 70, "block.jpg")
@@ -171,10 +182,14 @@ for line in lvl:
         if s == "4":
             Flag = Block(x, y, block_size, block_size, "flag.png")
             blocks.append(Flag)
+        if s == "5":
+            Coin = Block(x, y, block_size, block_size, "coin.png")
+            coins.append(Coin)
         x += 60
     x = 0
     y += 60
 # Игровой цикл
+repeat = True
 level = 1
 camera_count = 0
 cam_move = False
@@ -198,6 +213,20 @@ while game:
                     block.rect.x -= player.speed
             else:
                 cam_move = False
+        for Coin in coins:
+            Coin.update()
+            if player.rect.colliderect(Coin.rect):
+                coins.remove(Coin)
+                score += 1
+            if camera_count > 44 and camera_count < 93:
+                cam_move = True
+                k = key.get_pressed()
+                if k[K_a] and lose == 1:
+                    Coin.rect.x += player.speed
+                elif k[K_d] and lose == 1:
+                    Coin.rect.x -= player.speed
+            else:
+                cam_move = False
         for Shipi in shipis:
             Shipi.update()
             if camera_count > 44 and camera_count < 93:
@@ -208,10 +237,13 @@ while game:
                     Shipi.rect.x -= player.speed
             if (player.rect.bottom >= Shipi.rect.top-40 and player.rect.right >= Shipi.rect.left and player.rect.left <= Shipi.rect.right) or player.rect.colliderect(Shipi.rect):
                 lose = 2
-                mixer_music.stop()
-                mixer_music.load("gameover.mp3")
-                mixer_music.play(1)
-                mixer_music.set_volume(1)
+        if lose == 2 and repeat == True:
+            mixer_music.stop()
+            mixer_music.load("gameover.mp3")
+            mixer_music.play(1)
+            mixer_music.set_volume(1)
+            repeat = False
+            
         if player.rect.colliderect(Flag.rect):
 
             player.rect.x = 20
@@ -219,8 +251,10 @@ while game:
             cam_move = False
             camera_count = 0
             level += 1
+            score += 1
             blocks.clear()
             shipis.clear()
+            coins.clear()
             if level == 2:
                 x, y = 0, 0
 
@@ -238,6 +272,9 @@ while game:
                         if s == "4":
                             Flag = Block(x, y, block_size, block_size, "flag.png")
                             blocks.append(Flag)
+                        if s == "5":
+                            Coin = Block(x, y, block_size, block_size, "coin.png")
+                            coins.append(Coin)
                         x += 60
                     x = 0
                     y += 60
@@ -258,6 +295,9 @@ while game:
                         if s == "4":
                             Flag = Block(x, y, block_size, block_size, "flag.png")
                             blocks.append(Flag)
+                        if s == "5":
+                            Coin = Block(x, y, block_size, block_size, "coin.png")
+                            coins.append(Coin)
                         x += 60
                     x = 0
                     y += 60
@@ -267,10 +307,14 @@ while game:
             if lose == 1:
                 player.move()
             elif lose == 2:
-                sec_game = False
+                window.blit(text_surface_restart, text_rect_restart)
+
+
 
         player.jump(blocks)
         player.animation()
+        text_surface_score = font1.render(f"Очки: {score}", True, (255, 255, 255))
+        window.blit(text_surface_score, text_rect_score)
     elif all_game == False:
         window.blit(background_for_menu, (0, 0))
         window.blit(text_surface_menu, text_rect_menu)
@@ -283,6 +327,88 @@ while game:
         elif e.type == MOUSEBUTTONDOWN:
             if text_rect_play.collidepoint(e.pos):
                 all_game = True
+            if text_rect_restart.collidepoint(e.pos):
+                player.rect.x = 20
+                player.rect.y = win_h - 230
+                cam_move = False
+                camera_count = 0
+                score -= 1
+                lose = 1
+                repeat = True
+                blocks.clear()
+                shipis.clear()
+                coins.clear()
+                mixer_music.load("backgroundMusic.mp3")
+                mixer_music.play(-1)
+                mixer_music.set_volume(0.2)
+                if level == 1:
+                    x, y = 0, 0
 
+                    for line in lvl:
+                        for s in line:
+                            if s == "1":
+                                block = Block(x, y, block_size, block_size, "block.jpg")
+                                blocks.append(block)
+                            if s == "2":
+                                block = Block(x, y, block_size, block_size, "grass.jpg")
+                                blocks.append(block)
+                            if s == "3":
+                                Shipi = Block(x, y, block_size, block_size, "Shipi.png")
+                                shipis.append(Shipi)
+                            if s == "4":
+                                Flag = Block(x, y, block_size, block_size, "flag.png")
+                                blocks.append(Flag)
+                            if s == "5":
+                                Coin = Block(x, y, block_size, block_size, "coin.png")
+                                coins.append(Coin)
+                            x += 60
+                        x = 0
+                        y += 60
+                elif level == 2:
+                    x, y = 0, 0
+
+                    for line in lvl2:
+                        for s in line:
+                            if s == "1":
+                                block = Block(x, y, block_size, block_size, "block.jpg")
+                                blocks.append(block)
+                            if s == "2":
+                                block = Block(x, y, block_size, block_size, "grass.jpg")
+                                blocks.append(block)
+                            if s == "3":
+                                Shipi = Block(x, y, block_size, block_size, "Shipi.png")
+                                shipis.append(Shipi)
+                            if s == "4":
+                                Flag = Block(x, y, block_size, block_size, "flag.png")
+                                blocks.append(Flag)
+                            if s == "5":
+                                Coin = Block(x, y, block_size, block_size, "coin.png")
+                                coins.append(Coin)
+                            x += 60
+                        x = 0
+                        y += 60
+                elif level == 3:
+                    x, y = 0, 0
+
+                    for line in lvl3:
+                        for s in line:
+                            if s == "1":
+                                block = Block(x, y, block_size, block_size, "block.jpg")
+                                blocks.append(block)
+                            if s == "2":
+                                block = Block(x, y, block_size, block_size, "grass.jpg")
+                                blocks.append(block)
+                            if s == "3":
+                                Shipi = Block(x, y, block_size, block_size, "Shipi.png")
+                                shipis.append(Shipi)
+                            if s == "4":
+                                Flag = Block(x, y, block_size, block_size, "flag.png")
+                                blocks.append(Flag)
+                            if s == "5":
+                                Coin = Block(x, y, block_size, block_size, "coin.png")
+                                coins.append(Coin)
+                            x += 60
+                        x = 0
+                        y += 60
     display.update()
     clock.tick(FPS)
