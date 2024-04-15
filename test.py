@@ -65,7 +65,7 @@ class Player(Sprite):
         self.count = 0
 
         self.jumping = False
-        self.jumpCount = 20
+        self.jumpCount = 25
 
     def move(self):
         global camera_count
@@ -86,7 +86,11 @@ class Player(Sprite):
             self.left = False
             self.right = False
             self.count = 0
-
+    # def death(self):
+    #     if self.rect.y > (win_h+50):
+    #         window.blit(walk_right[1], (self.rect.x, self.rect.y))
+    #         self.jump(blocks)
+        
     def animation(self):
         if self.count + 1 >= 20:
             self.count = 0
@@ -104,21 +108,20 @@ class Player(Sprite):
             if k[K_SPACE]:
                 self.jumping = True
         else:
-            self.rect.y += self.speed //2 * lose
+            self.rect.y += self.speed * lose
         if self.jumping:
             if self.jumpCount == -15:
-                self.jumpCount = 20
+                self.jumpCount = 25
                 self.jumping = False
             else:
                 self.rect.y -= self.jumpCount
                 self.jumpCount -= 1
 
-
     def colide(self,blocks):
         for block in blocks:
-            if self.rect.bottom >= block.rect.top-(self.speed//2) and self.rect.bottom <= block.rect.top+(self.speed//2) and self.rect.right >= block.rect.left and self.rect.left <= block.rect.right and lose == 1:
+            if self.rect.bottom >= block.rect.top-(self.speed) and self.rect.bottom <= block.rect.top+(self.speed) and self.rect.right >= block.rect.left and self.rect.left <= block.rect.right and lose == 1:
                 self.rect.bottom = block.rect.top
-                self.jumpCount = 20
+                self.jumpCount = 25
                 self.jumping = False
                 return True
 # Создание текстовой надписи
@@ -137,11 +140,14 @@ text_surface_options = font2.render("СКОРО...", True, (0,0,0))
 text_rect_options = text_surface_options.get_rect()
 text_rect_options.center = (win_w // 6, win_h // 2)
 # Создание объектов и персонажа
+level = 1
 lose = 1
-player = Player(20, win_h - 230, 47, 62, "mainChar.png", 10)
+win = False
+player = Player(20, win_h - 230, 47, 62, 'mainChar.png', 10)
 blocks_first = list()
-shipis = list()
 blocks = blocks_first
+
+shipis = list()
 # grass = Block(180, win_h - 140, 70, 70, "block.jpg")
 # block3 = Block(180, win_h - 210, 70, 70, "block.jpg")
 # Shipi = Block(100, win_h - 140, 70, 70, "Shipi.png")
@@ -151,8 +157,6 @@ blocks = blocks_first
 # blocks_first.append(grass)
 # blocks_first.append(Flag)
 # blocks_first.append(Shipi)
-my_x = 0
-my_y = win_h - 70
 
 block_size = 60
 x, y = 0, 0
@@ -175,9 +179,8 @@ for line in lvl:
     x = 0
     y += 60
 # Игровой цикл
-level = 1
-camera_count = 0
 cam_move = False
+camera_count = 0
 pause = False
 game = True
 sec_game = True
@@ -187,6 +190,13 @@ while game:
         print(camera_count)
         # Второстепенная часть цикла
         window.blit(background, (0, 0))
+        # if sec_game:
+        #     elif lose == 2:
+        #         player.death()
+        #         # sec_game = False
+
+            
+        
         for block in blocks_first:
             block.update()
             if camera_count > 44 and camera_count < 93:
@@ -196,22 +206,25 @@ while game:
                     block.rect.x += player.speed
                 elif k[K_d] and lose == 1:
                     block.rect.x -= player.speed
-            else:
-                cam_move = False
+                else:
+                    cam_move = False
         for Shipi in shipis:
             Shipi.update()
-            if camera_count > 44 and camera_count < 93:
-                k = key.get_pressed()
-                if k[K_a] and lose == 1:
-                    Shipi.rect.x += player.speed
-                elif k[K_d] and lose == 1:
-                    Shipi.rect.x -= player.speed
             if (player.rect.bottom >= Shipi.rect.top-40 and player.rect.right >= Shipi.rect.left and player.rect.left <= Shipi.rect.right) or player.rect.colliderect(Shipi.rect):
                 lose = 2
                 mixer_music.stop()
                 mixer_music.load("gameover.mp3")
                 mixer_music.play(1)
                 mixer_music.set_volume(1)
+            if camera_count > 44 and camera_count < 93:
+                cam_move = True
+                k = key.get_pressed()
+                if k[K_a] and lose == 1:
+                    Shipi.rect.x += player.speed
+                elif k[K_d] and lose == 1:
+                    Shipi.rect.x -= player.speed
+                else:
+                    cam_move = False
         if player.rect.colliderect(Flag.rect):
 
             player.rect.x = 20
@@ -263,14 +276,12 @@ while game:
                     y += 60
             else:
                 win = True
-        if sec_game:
-            if lose == 1:
-                player.move()
-            elif lose == 2:
-                sec_game = False
-
-        player.jump(blocks)
-        player.animation()
+        
+        if lose == 1:
+            player.move()
+            player.jump(blocks)
+            player.animation()
+# player = Player(20, win_h - 230, 47, 62, "mainChar.png", 10)
     elif all_game == False:
         window.blit(background_for_menu, (0, 0))
         window.blit(text_surface_menu, text_rect_menu)
